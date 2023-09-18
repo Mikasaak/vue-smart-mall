@@ -1,12 +1,12 @@
 <template>
     <div>
-      SearchIndex
+        I am Layout
     </div>
 </template>
 
 <script>
 export default {
-  name: 'SearchIndex',
+  name: 'LayoutIndex',
 
   data () {
     return {

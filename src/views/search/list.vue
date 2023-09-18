@@ -1,12 +1,12 @@
 <template>
     <div>
-      SearchIndex
+        I am searchList
     </div>
 </template>
 
 <script>
 export default {
-  name: 'SearchIndex',
+  name: 'SearchList',
 
   data () {
     return {

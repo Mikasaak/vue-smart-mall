@@ -1,6 +1,6 @@
 <template>
     <div>
-
+        I am MyOrderIndex
     </div>
 </template>
 
