@@ -4,6 +4,8 @@ import router from './router'
 import store from './store'
 import '@/utils/request'
 import '@/utils/vant-ui'
+import '@/style/commen.less'
+
 Vue.config.productionTip = false
 
 new Vue({
