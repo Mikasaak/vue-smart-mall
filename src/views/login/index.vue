@@ -17,7 +17,7 @@
         </div>
         <div class="form-item">
           <input class="inp" placeholder="请输入短信验证码" type="text">
-          <button @click='getPhoneCode()' :disabled="timer">{{ !timer ? '获取验证码' : second + `秒后重新发送`}}</button>
+          <button @click='getPhoneCode()' :disabled="timer" >{{ !timer ? '获取验证码' : second + `秒后重新发送`}}</button>
         </div>
       </div>
 
@@ -58,12 +58,9 @@ export default {
         this.$toast(res.message)
       }
     },
-    isPhoneNumber (phoneNumber) {
+    validPhoneNumberAndPicCode (phoneNumber) {
       const reg = /^(0|86|17951)?(13[0-9]|15[012356789]|166|17[3678]|18[0-9]|14[57])[0-9]{8}$/
-      return reg.test(phoneNumber)
-    },
-    async getPhoneCode () {
-      if (!this.isPhoneNumber(this.phoneNumber)) {
+      if (!reg.test(phoneNumber)) {
         this.$toast('请输入正确的手机号')
         return false
       }
@@ -71,13 +68,12 @@ export default {
         this.$toast('请输入图形验证码')
         return false
       }
-      const res = await getPhoneCode({
-        form: {
-          captchaCode: this.picCode,
-          captchaKey: this.picKey,
-          mobile: this.phoneNumber
-        }
-      })
+      return true
+    },
+    async getPhoneCode () {
+      if (this.timer) return
+      if (!this.validPhoneNumberAndPicCode(this.phoneNumber)) return
+      const res = await getPhoneCode(this.picCode, this.picKey, this.phoneNumber)
       console.log(res)
       if (res.status !== 200) {
         this.$toast(res.message)
@@ -89,6 +85,7 @@ export default {
     },
     // 开启定时器
     startTimer () {
+      if (this.timer) return
       this.timer = setInterval(() => {
         this.second--
         if (this.second === 0) {
