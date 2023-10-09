@@ -14,3 +14,13 @@ export function getPhoneCode (captchaCode, captchaKey, mobile) {
         }
   })
 }
+export function userLogin (mobile, smsCode) {
+  return request.post('/passport/login', {
+    form: {
+      mobile,
+      smsCode,
+      isParty: false,
+      partyData: {}
+    }
+  })
+}

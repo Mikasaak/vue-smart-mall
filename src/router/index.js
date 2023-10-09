@@ -13,6 +13,7 @@ import Cart from '@/views/layout/cart.vue'
 import Category from '@/views/layout/category.vue'
 import Home from '@/views/layout/home.vue'
 import User from '@/views/layout/user.vue'
+import store from '@/store'
 
 Vue.use(VueRouter)
 
@@ -65,7 +66,7 @@ const routes = [
     component: SearchList
   },
   {
-    path: '/prodetail',
+    path: '/prodetail/:id',
     component: ProDetail
   }
 ]
@@ -73,5 +74,17 @@ const routes = [
 const router = new VueRouter({
   routes
 })
-
+router.beforeEach((to, from, next) => {
+  const authUrl = ['/pay', '/myorder']
+  if (authUrl.includes(to.path)) {
+    const token = store.getters.UserInfo.token
+    if (token) {
+      next()
+    } else {
+      next('/login')
+    }
+  }
+  next()
+}
+)
 export default router

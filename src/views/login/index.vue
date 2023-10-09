@@ -1,6 +1,6 @@
 <template>
   <div class="login">
-    <van-nav-bar title="会员登录" left-arrow @click-left="$router.go(-1)" />
+    <van-nav-bar title="会员登录" left-arrow @click-left="$router.go(-1)"/>
     <div class="container">
       <div class="title">
         <h3>手机号登录</h3>
@@ -16,18 +16,19 @@
           <img v-if="picBase64" :src="picBase64" alt="" @click="getPicCode">
         </div>
         <div class="form-item">
-          <input class="inp" placeholder="请输入短信验证码" type="text">
-          <button @click='getPhoneCode()' :disabled="timer" >{{ !timer ? '获取验证码' : second + `秒后重新发送`}}</button>
+          <input class="inp" placeholder="请输入短信验证码" type="text" v-model="SmsCode">
+          <button @click='getPhoneCode()' :disabled="timer">{{ !timer ? '获取验证码' : second + `秒后重新发送` }}
+          </button>
         </div>
       </div>
 
-      <div class="login-btn">登录</div>
+      <div class="login-btn" @click="userLogin">登录</div>
     </div>
   </div>
 </template>
 
 <script>
-import { getPicCode, getPhoneCode } from '@/api/login'
+import { getPicCode, getPhoneCode, userLogin } from '@/api/login'
 
 export default {
   name: 'LoginPart',
@@ -44,12 +45,14 @@ export default {
       picKey: '', // 图形验证码的 key
       picCode: '', // 图形验证码
       phoneNumber: '', // 手机号
+      SmsCode: '',
       totalSecond: 5, // 总秒数
       second: 5, // 倒计时的秒数
       timer: null // 定时器 id
     }
   },
   methods: {
+    // 获取图形验证码
     async getPicCode () {
       const res = await getPicCode()
       this.picBase64 = res.data.base64
@@ -58,6 +61,7 @@ export default {
         this.$toast(res.message)
       }
     },
+    // 验证手机号和图形验证码
     validPhoneNumberAndPicCode (phoneNumber) {
       const reg = /^(0|86|17951)?(13[0-9]|15[012356789]|166|17[3678]|18[0-9]|14[57])[0-9]{8}$/
       if (!reg.test(phoneNumber)) {
@@ -68,19 +72,6 @@ export default {
         this.$toast('请输入图形验证码')
         return false
       }
-      return true
-    },
-    async getPhoneCode () {
-      if (this.timer) return
-      if (!this.validPhoneNumberAndPicCode(this.phoneNumber)) return
-      const res = await getPhoneCode(this.picCode, this.picKey, this.phoneNumber)
-      console.log(res)
-      if (res.status !== 200) {
-        this.$toast(res.message)
-        return false
-      }
-      this.$toast('验证码发送成功')
-      this.startTimer()
       return true
     },
     // 开启定时器
@@ -94,6 +85,30 @@ export default {
           this.second = this.totalSecond
         }
       }, 1000)
+    },
+    // 获取手机验证码逻辑
+    async getPhoneCode () {
+      if (this.timer) return
+      if (!this.validPhoneNumberAndPicCode(this.phoneNumber)) return
+      const res = await getPhoneCode(this.picCode, this.picKey, this.phoneNumber)
+      console.log(res)
+      this.$toast('验证码发送成功')
+      this.startTimer()
+      return true
+    },
+    // 登录逻辑
+    async userLogin () {
+      // 验证手机号和图形验证码
+      if (!this.validPhoneNumberAndPicCode(this.phoneNumber)) return
+      if (!this.SmsCode) {
+        this.$toast('请输入短信验证码')
+        return
+      }
+      const res = await userLogin(this.phoneNumber, this.SmsCode)
+      console.log(res)
+      this.$toast('登录成功')
+      this.$store.commit('user/setUserInfo', res.data)
+      this.$router.push('/home')
     }
   }
 }
@@ -105,10 +120,12 @@ export default {
 
   .title {
     margin-bottom: 20px;
+
     h3 {
       font-size: 26px;
       font-weight: normal;
     }
+
     p {
       line-height: 40px;
       font-size: 14px;
@@ -122,6 +139,7 @@ export default {
     margin-bottom: 14px;
     display: flex;
     align-items: center;
+
     .inp {
       display: block;
       border: none;
@@ -130,10 +148,12 @@ export default {
       font-size: 14px;
       flex: 1;
     }
+
     img {
       width: 94px;
       height: 31px;
     }
+
     button {
       height: 31px;
       border: none;
@@ -148,10 +168,10 @@ export default {
     width: 100%;
     height: 42px;
     margin-top: 39px;
-    background: linear-gradient(90deg,#ecb53c,#ff9211);
+    background: linear-gradient(90deg, #ecb53c, #ff9211);
     color: #fff;
     border-radius: 39px;
-    box-shadow: 0 10px 20px 0 rgba(0,0,0,.1);
+    box-shadow: 0 10px 20px 0 rgba(0, 0, 0, .1);
     letter-spacing: 2px;
     display: flex;
     justify-content: center;
