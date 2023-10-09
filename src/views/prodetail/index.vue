@@ -100,7 +100,7 @@
           <span>数量</span>
           <CountBox v-model="count"></CountBox>
         </div>
-        <div class="showbtn" v-if="detail.stock_total > 0">
+        <div class="showbtn" v-if="detail.stock_total > 0" @click="addCartOrBuyNow">
           <div class="btn" v-if="mode==='cart'">加入购物车</div>
           <div class="btn now" v-else>立刻购买</div>
         </div>
@@ -164,6 +164,30 @@ export default {
     buyNow () {
       this.showPannel = true
       this.mode = 'buy'
+    },
+    addCartOrBuyNow () {
+      console.log('加入购物车或立刻购买')
+      if (!this.$store.getters.UserInfo.token) {
+        this.$dialog.confirm({
+          title: '温馨提示',
+          message: '此时需要先登录才能继续操作哦',
+          confirmButtonText: '去登录',
+          cancelButtonText: '再逛逛'
+        }).then(
+          () => {
+            console.log('去登录')
+            this.$router.replace({
+              path: '/login',
+              query: {
+                redirect: this.$route.fullPath
+              }
+            })
+          }
+        )
+          .catch(
+            () => {}
+          )
+      }
     }
   },
   computed: {

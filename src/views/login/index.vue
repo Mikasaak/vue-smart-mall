@@ -108,7 +108,7 @@ export default {
       console.log(res)
       this.$toast('登录成功')
       this.$store.commit('user/setUserInfo', res.data)
-      this.$router.push('/home')
+      this.$router.replace(this.$route.query.redirect || '/')
     }
   }
 }
