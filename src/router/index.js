@@ -51,7 +51,7 @@ const routes = [
     component: Pay
   },
   {
-    path: '/mayorder',
+    path: '/myorder',
     component: MyOrder
   },
   {
@@ -76,7 +76,7 @@ const router = new VueRouter({
   routes
 })
 router.beforeEach((to, from, next) => {
-  const authUrl = ['/pay', '/myorder']
+  const authUrl = ['/pay', '/myorder', '/cart']
   if (authUrl.includes(to.path)) {
     const token = store.getters.UserInfo.token
     if (token) {

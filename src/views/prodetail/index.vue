@@ -102,7 +102,7 @@
           <CountBox v-model="count"></CountBox>
         </div>
         <div class="showbtn" v-if="detail.stock_total > 0" @click="addCartOrBuyNow">
-          <div class="btn" v-if="mode==='cart'" @click="addToCart">加入购物车</div>
+          <div class="btn" v-if="mode==='cart'" @click="addToCart()">加入购物车</div>
           <div class="btn now" v-else>立刻购买</div>
         </div>
         <div class="btn-none" v-else>该商品已抢完</div>
@@ -117,6 +117,7 @@ import { getProDetail, getReviews } from '@/api/produce'
 import defaultImg from '@/assets/default-avatar.png'
 import CountBox from '@/components/CountBox.vue'
 import { addToCart } from '@/api/cart'
+import { mapState } from 'vuex'
 
 export default {
   name: 'ProDetail',
@@ -124,7 +125,8 @@ export default {
   created () {
     this.getDetail()
     this.getReviews()
-    this.$store.dispatch('cart/getCartList')
+    if (this.$store.getters.UserInfo.token
+    ) { this.$store.dispatch('cart/getCartList') }
   },
   data () {
     return {
@@ -136,13 +138,16 @@ export default {
       defaultImg,
       mode: 'cart',
       showPannel: false,
-      count: 1,
-      cartTotal: this.$store.state.cart.cartTotal
+      count: 1
     }
   },
+
   methods: {
     onChange (index) {
       this.current = index
+    },
+    updateCartCount () {
+      this.$store.dispatch('cart/getCartList')
     },
     async getDetail () {
       const { data: { detail } } = await getProDetail(this.goodsId)
@@ -174,6 +179,7 @@ export default {
       this.cartTotal = cartTotal
       this.$toast.success('加入购物车成功')
       this.showPannel = false
+      this.updateCartCount()
     },
     addCartOrBuyNow () {
       console.log('加入购物车或立刻购买')
@@ -205,7 +211,8 @@ export default {
     // 从路由中获取商品id
     goodsId () {
       return this.$route.params.id
-    }
+    },
+    ...mapState('cart', ['cartTotal'])
   }
 }
 </script>
