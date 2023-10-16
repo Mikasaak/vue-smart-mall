@@ -30,7 +30,7 @@ export default {
   data () {
     return {
       searchHistory: getSearchHistory(),
-      searchWord: this.$route.query.search || ''
+      searchWord: this.getSearchWords()
     }
   },
   mounted () {
@@ -55,6 +55,12 @@ export default {
       this.searchHistory = []
       setSearchHistory(this.searchHistory)
       this.$toast.success('清除成功')
+    },
+    getSearchWords () {
+      if (this.$route.query.search === 'undefined') {
+        return ''
+      }
+      return this.$route.query.search
     }
   }
 }
