@@ -103,7 +103,7 @@
         </div>
         <div class="showbtn" v-if="detail.stock_total > 0" @click="addCartOrBuyNow">
           <div class="btn" v-if="mode==='cart'" @click="addToCart()">加入购物车</div>
-          <div class="btn now" v-else>立刻购买</div>
+          <div class="btn now" v-else @click="buyNow">立刻购买</div>
         </div>
         <div class="btn-none" v-else>该商品已抢完</div>
       </div>
@@ -118,10 +118,12 @@ import defaultImg from '@/assets/default-avatar.png'
 import CountBox from '@/components/CountBox.vue'
 import { addToCart } from '@/api/cart'
 import { mapState } from 'vuex'
+import { loginConfirm } from '@/mixins/loginConfirm'
 
 export default {
   name: 'ProDetail',
   components: { CountBox },
+  mixins: [loginConfirm],
   created () {
     this.getDetail()
     this.getReviews()
@@ -183,34 +185,31 @@ export default {
     },
     addCartOrBuyNow () {
       console.log('加入购物车或立刻购买')
-      if (!this.$store.getters.UserInfo.token) {
-        this.$dialog.confirm({
-          title: '温馨提示',
-          message: '此时需要先登录才能继续操作哦',
-          confirmButtonText: '去登录',
-          cancelButtonText: '再逛逛'
-        }).then(
-          () => {
-            console.log('去登录')
-            this.$router.replace({
-              path: '/login',
-              query: {
-                redirect: this.$route.fullPath
-              }
-            })
-          }
-        )
-          .catch(
-            () => {
-            }
-          )
-      }
+      this.loginConfirm()
+    },
+    buyNow () {
+      console.log('立刻购买')
+      this.$router.push({
+        path: '/pay',
+        query: {
+          mode: 'buyNow',
+          goodsId: this.goodsId,
+          goodsNum: this.goodsNum,
+          goodsSkuId: this.goodsSkuId
+        }
+      })
     }
   },
   computed: {
     // 从路由中获取商品id
     goodsId () {
       return this.$route.params.id
+    },
+    goodsNum () {
+      return this.count
+    },
+    goodsSkuId () {
+      return this.detail.skuList[0].goods_sku_id
     },
     ...mapState('cart', ['cartTotal'])
   }

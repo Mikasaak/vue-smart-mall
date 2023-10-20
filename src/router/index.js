@@ -47,10 +47,6 @@ const routes = [
     component: Login
   },
   {
-    path: '/pay',
-    component: Pay
-  },
-  {
     path: '/myorder',
     component: MyOrder
   },

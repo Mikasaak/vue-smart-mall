@@ -43,7 +43,7 @@
             <span>合计：</span>
             <span>¥ <i class="totalPrice">{{checkedGoodsAmount}}</i></span>
           </div>
-          <div v-if="!isEdit" class="goPay" :class="{'disabled': checkedGoodsCount === 0}">结算({{checkedGoodsCount}})</div>
+          <div v-if="!isEdit" class="goPay" :class="{'disabled': checkedGoodsCount === 0}" @click="submitOrder">结算({{checkedGoodsCount}})</div>
           <div v-else class="delete" :class="{'disabled': checkedGoodsCount === 0}" @click="delCartItems">删除</div>
         </div>
       </div>
@@ -75,6 +75,9 @@ export default {
     this.$store.dispatch('cart/getCartList')
   },
   computed: {
+    cartIds () {
+      return this.cartList.map(item => item.id).join(',')
+    },
     ...mapState('cart', ['cartList']),
     ...mapGetters('cart', ['allGoodsCount', 'checkedGoodsList', 'checkedGoodsCount', 'checkedGoodsAmount', 'isAllChecked'])
   },
@@ -93,6 +96,15 @@ export default {
     },
     setProductCount (goodsId, goodsNum, goodsSkuId) {
       this.$store.dispatch('cart/setProductCountAction', { goodsId, goodsNum, goodsSkuId })
+    },
+    submitOrder () {
+      this.$router.push({
+        path: '/pay',
+        query: {
+          mode: 'cart',
+          cartIds: this.cartIds
+        }
+      })
     }
   },
   watch: {
